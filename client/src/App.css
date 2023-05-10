@@ -39,14 +39,20 @@
   }
 }
 
+
+input[id^="react-select-"] { /*every input with the id of "this"*/
+  @apply focus:outline-none focus:border-transparent focus:ring-0;
+}
+
 body {
-  background-image: url(/public/grey_wash_wall.png);
+  background-image: url(/public/cartographer.png);
+  /* background-color: #111827; */
 }
 
 .Mother {
   width: 100%;
   height: 80px;
-  border-bottom: 2px solid black;
+  /* border-bottom: 2px solid black; */
   display: flex;
   color: black;
   font-weight: 700;
@@ -54,12 +60,22 @@ body {
   /* background-color: #e7e5e4; */
   background-color: #e2e8f0;
   /* background-image: url(/public/stardust.png); */
+  position: sticky;
 }
 
 .Mother img {
   height: 70px;
-  margin-top: 5px
+  margin-top: 5px;
 }
+
+
+.navbarHeader {
+  width: 500px;
+  display:flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
 
 .searchBar {
   border: 2px solid black;
@@ -70,13 +86,6 @@ body {
   background-color: #d4d4d8;
 }
 
-.navbarHeader {
-  width: 500px;
-  display:flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
 .searchBarContainer {
   display: flex;
   align-items: center;
@@ -85,15 +94,15 @@ body {
 .searchIcon {
   position: absolute;
   top: 28px;
-  right: 43.5%;
+  right: 44.5%;
 }
 
 .highlightHeader {
-  border-bottom: 2px solid black;
+  border-bottom: 2px solid floralwhite;
   height: 300px;
+  width: 30%;
   display: flex;
   align-items: end;
-  padding-left: 23px;
   font-size: 33px;
   font-weight: 400;
 }
@@ -349,6 +358,7 @@ body {
   /* background-color: yellow; */
   display: flex;
   justify-content: space-between;
+  color: floralwhite;
 }
 .productLandingDetailsView {
   width: 660px;

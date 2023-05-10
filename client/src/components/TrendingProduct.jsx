@@ -1,7 +1,13 @@
 const TrendingProduct = () => {
   return (
     <div className="productContainer">
-      <div className="highlightHeader">Trending</div>
+      <div className="w-full flex justify-center">
+        <div className="highlightHeader"></div>
+        <div className="flex items-end h-80 text-[33px] font-normal px-5 text-white-50">
+          Trending
+        </div>
+        <div className="highlightHeader"></div>
+      </div>
       <div className="productImageContainer">
         <div id="bigImage" className="bigImageTrend"></div>
         <div className="splitImageContainer">
