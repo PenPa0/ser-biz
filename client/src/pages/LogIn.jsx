@@ -15,8 +15,18 @@ const LogIn = () => {
     axios
       .post("http://localhost:8000/auth", account_Info)
       .then(function (response) {
+        localStorage.setItem("jwt_token", response.data);
         console.log(response);
-        toast.success("Logged In");
+        toast.success(`Welcome Back ${account_Info.user_email}`, {
+          position: "top-center",
+          autoClose: 1000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+        });
         navigate("/");
         auth.setUser(account_Info.user_email);
       })
@@ -54,7 +64,7 @@ const LogIn = () => {
                           });
                         }}
                         type="email"
-                        className="w-full -ml-10 pl-10 pr-3 py-2 rounded-lg border-2 border-gray-200 outline-none focus:border-indigo-500"
+                        className="w-full -ml-10 pl-10 pr-3 py-2 rounded-lg border-2 border-gray-200 outline-none focus:border-indigo-500 text-black"
                         placeholder="johnsmith@example.com"
                       />
                     </div>
@@ -77,7 +87,7 @@ const LogIn = () => {
                           setAccount_Info({ ...account_Info, password: value });
                         }}
                         type="password"
-                        className="w-full -ml-10 pl-10 pr-3 py-2 rounded-lg border-2 border-gray-200 outline-none focus:border-indigo-500"
+                        className="w-full -ml-10 pl-10 pr-3 py-2 rounded-lg border-2 border-gray-200 outline-none focus:border-indigo-500 text-black"
                         placeholder="************"
                       />
                     </div>
@@ -87,7 +97,7 @@ const LogIn = () => {
                   <div className="w-full px-3 mb-5">
                     <button
                       type="submit"
-                      className="block w-full max-w-xs mx-auto bg-indigo-500 hover:bg-indigo-700 focus:bg-indigo-700 text-white rounded-lg px-3 py-3 font-semibold"
+                      className="text-white-50 block w-full max-w-xs mx-auto bg-indigo-500 hover:bg-indigo-700 focus:bg-indigo-700 text-white rounded-lg px-3 py-3 font-semibold"
                     >
                       Log In
                     </button>

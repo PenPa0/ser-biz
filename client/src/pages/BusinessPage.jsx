@@ -8,9 +8,12 @@ import axios from "axios";
 
 const BusinessPage = () => {
   const [user, setUser] = useState([]);
+  const config = {
+    headers: { Authorization: `Bearer ${localStorage.getItem("jwt_token")}` },
+  };
 
   const getUsers = async () => {
-    const response = await axios.get("http://localhost:8000/all-users");
+    const response = await axios.get("http://localhost:8000/all-users", config);
     setUser(response.data);
   };
 

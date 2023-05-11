@@ -8,6 +8,7 @@ const bodyParser = require("body-parser");
 const bcrypt = require("bcrypt");
 const createToken = require("./jwt-token/generateToken");
 const PORT = 8000;
+const auth = require("./middleware/auth");
 
 const Pool = require("pg").Pool; // initializing
 
@@ -37,7 +38,7 @@ app.get("/", (request, response) => {
 });
 
 // get all data from table
-app.get("/all-users", (request, response) => {
+app.get("/all-users", auth.verifyToken, (request, response) => {
   pool.query("SELECT * FROM users", (error, results) => {
     if (error) {
       throw error;
@@ -80,7 +81,7 @@ app.get("/get-user/:id", (request, response) => {
 app.post("/add-user", async (request, response) => {
   const { first_name, last_name, user_email, password } = request.body;
   const encryptedPassword = await bcrypt.hashSync(password, 10);
-  const newUser = await pool.query(
+  await pool.query(
     "INSERT INTO users (first_name, last_name, user_email, password) VALUES ($1,$2,$3,$4)",
     [first_name, last_name, user_email, encryptedPassword],
     (error, results) => {
@@ -97,7 +98,7 @@ app.post("/add-user", async (request, response) => {
   );
   // const token = createToken(newUser.rows[0]); //added during JWT session
   // response.json({ token });
-  console.log(newUser);
+  // console.log(newUser);
 });
 
 // verification
@@ -115,7 +116,8 @@ app.post("/auth", (request, response) => {
       const dbPassword = results.rows[0].password;
       const isVerified = bcrypt.compareSync(password, dbPassword);
       if (isVerified) {
-        response.status(200).send("Logged in this is backend");
+        const token = createToken({ ...request.body, password: dbPassword });
+        response.status(200).send(token);
       } else {
         response.status(401).send();
       }

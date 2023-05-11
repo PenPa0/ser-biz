@@ -19,7 +19,7 @@ const BusinessForm = () => {
   //     boxShadow: "none",
   //   }),
   // };
-  const business_types = [
+  const options_business_types = [
     { value: "restaurant", label: "Restaurant" },
     { value: "toy_shop", label: "Toy Shop" },
     { value: "pet_clinic", label: "Veterinary Clinic" },
@@ -31,29 +31,41 @@ const BusinessForm = () => {
     <div className="border-2 mt-5">
       <form>
         <div className="flex flex-col gap-y-3 w-3/5 border-2 m-auto border-solid bg-slate-50">
-          <label className="text-2xl font-semibold px-1">
-            Please Provide information about your business
+          Please Provide information about your business.
+          <label className="text-left" htmlFor="businessName">
+            Business Name
           </label>
           <input
             id="businessName"
             type="text"
-            placeholder="business name"
+            placeholder="ex. Zee's Pizza Tree"
             className="pl-10 shadow-lg w-1/4 pr-3 py-2 rounded-lg border-2 border-gray-200 outline-none focus:border-indigo-500"
           />
+          <label className="text-left" htmlFor="businessTag">
+            Business Tag
+          </label>
           <CreatableSelect
             // styles={style}
-            className="shadow-lg"
+            id="businessTag"
+            className="shadow-lg w-1/2"
             isMulti
-            options={business_types}
+            options={options_business_types}
             // options={business_types}
             placeholder="Business Type"
           />
+          <label className="text-left" htmlFor="businessAdress">
+            Business Address
+          </label>
           <input
             type="text"
             placeholder="business address"
             className="pl-10 w-1/4 pr-3 py-2 rounded-lg border-2 border-gray-200 outline-none focus:border-indigo-500"
           />
+          <label className="text-left" htmlFor="businessContacts">
+            Business Contacts
+          </label>
           <input
+            id="businessContacts"
             value={contacts}
             type="tel"
             placeholder="business contact"
@@ -62,16 +74,30 @@ const BusinessForm = () => {
               numberHandler(e);
             }}
           />
+          <label className="text-left" htmlFor="businessSocials">
+            Business Socials
+          </label>
           <input
+            id="businessSocials"
             type="text"
             placeholder="business socials"
             className="pl-10 w-1/4 pr-3 py-2 rounded-lg border-2 border-gray-200 outline-none focus:border-indigo-500"
           />
+          <label className="text-left" htmlFor="businessEmail">
+            Business Email
+          </label>
           <input
+            id="businessEmail"
             type="email"
             placeholder="business email"
             className="pl-10 w-1/4 pr-3 py-2 rounded-lg border-2 border-gray-200 outline-none focus:border-indigo-500"
           />
+          <label className="text-left" htmlFor="businessDescription">
+            Business Description
+          </label>
+          <input className="w-1/2" type="file" />
+          <input type="file" />
+          <input type="file" />
           <textarea
             rows="5"
             placeholder="Describe your business"

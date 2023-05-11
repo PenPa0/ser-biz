@@ -19,7 +19,8 @@ const SignUp = () => {
     axios
       .post("http://localhost:8000/add-user", register)
       .then(function (response) {
-        console.log(response);
+        localStorage.setItem("jwt_token", response.data);
+        console.log(response.data);
         toast.success("Registered!");
         navigate("/");
       })
