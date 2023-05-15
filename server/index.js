@@ -63,20 +63,6 @@ app.get("/get-user/:id", (request, response) => {
 });
 
 // post
-// app.post("/add-user", (request, response) => {
-//   const { name, email } = request.body;
-
-//   pool.query(
-//     "INSERT INTO users (name, email) VALUES ($1, $2)",
-//     [name, email],
-//     (error, results) => {
-//       if (error) {
-//         throw error;
-//       }
-//       response.status(201).send("User added");
-//     }
-//   );
-// });
 // now encrypted
 app.post("/add-user", async (request, response) => {
   const { first_name, last_name, user_email, password } = request.body;
@@ -116,7 +102,8 @@ app.post("/auth", (request, response) => {
       const dbPassword = results.rows[0].password;
       const isVerified = bcrypt.compareSync(password, dbPassword);
       if (isVerified) {
-        const token = createToken({ ...request.body, password: dbPassword });
+        const token = createToken({ ...request.body, password: dbPassword }); //never store password in token
+        // const token = createToken({ ...request.body, password: dbPassword }); //never store password in token
         response.status(200).send(token);
       } else {
         response.status(401).send();
@@ -125,29 +112,6 @@ app.post("/auth", (request, response) => {
     }
   );
 });
-
-// app.post("/auth", (request, response) => {
-//   const { user_email, password } = request.body;
-
-//   pool.query(
-//     "SELECT password FROM users WHERE user_email = $1",
-//     [user_email],
-//     (error, results) => {
-//       if (error) {
-//         throw error;
-//       }
-//       // console.log(results.rows[0].password);
-//       const dbPassword = results.rows[0].password;
-//       const isVerified = bcrypt.compareSync(password, dbPassword);
-//       if (isVerified) {
-//         response.status(200).send("Logged in this is backend");
-//       } else {
-//         response.status(401).send();
-//       }
-//       // console.log(isVerified);
-//     }
-//   );
-// });
 
 // put
 app.put("/update-user/:id", (request, response) => {
