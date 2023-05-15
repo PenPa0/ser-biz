@@ -7,17 +7,19 @@ import BusinessPage from "./pages/BusinessPage";
 import { Route, Routes, Navigate } from "react-router-dom";
 import SignUp from "./pages/SignUp";
 import LogIn from "./pages/LogIn";
+import MyBusiness from "./pages/MyBusiness";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import CreateBusiness from "./pages/CreateBusiness";
 import { AuthProvider, AuthContext } from "./contexts/AuthContext";
 import { useContext } from "react";
+import AdminPage from "./pages/AdminPage";
 
 function App() {
   const auth = useContext(AuthContext);
   return (
     <div className="App">
-      <div className="h-[30px] bg-red-800">{auth?.user}</div>{" "}
+      {/* <div className="h-[30px] bg-red-800">{auth?.user}</div>{" "} */}
       {/* for testing and seeing if user is logged in */}
       <ToastContainer />
       {/* <h1>SANITY TEST</h1> */}
@@ -26,6 +28,7 @@ function App() {
       {/* <img src="./SerBizNavLogo.png" className="App-logo" alt="logo" /> */}
       {/* <HomePage /> */}
       <Routes>
+        <Route path="/AdminPage" element={<AdminPage />} />
         <Route path="/" element={<HomePage />} />
         <Route path="/Business" element={<BusinessPage />} />
         <Route path="/About" element={<AboutPage />} />
@@ -39,6 +42,7 @@ function App() {
           // render={(props) => <CreateBusiness {...props} />}
           // element={<CreateBusiness />}
         />
+        <Route path="/My-Business" element={<MyBusiness />} />
         {/* <Route path="/Create-Business" element={<Navigate to="/Sign-up" />} /> */}
       </Routes>
       {/* <HomePageLoggedIn /> */}
