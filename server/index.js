@@ -67,6 +67,7 @@ app.get("/get-user/:id", (request, response) => {
 app.post("/add-user", async (request, response) => {
   const { first_name, last_name, user_email, password } = request.body;
   const encryptedPassword = await bcrypt.hashSync(password, 10);
+  // const userRole = "user"
   await pool.query(
     "INSERT INTO users (first_name, last_name, user_email, password) VALUES ($1,$2,$3,$4)",
     [first_name, last_name, user_email, encryptedPassword],
@@ -103,6 +104,7 @@ app.post("/auth", (request, response) => {
       const isVerified = bcrypt.compareSync(password, dbPassword);
       if (isVerified) {
         const token = createToken({ ...request.body, password: dbPassword }); //never store password in token
+        // const token = createToken({ ...request.body, role }); //never store password in token
         // const token = createToken({ ...request.body, password: dbPassword }); //never store password in token
         response.status(200).send(token);
       } else {
@@ -113,6 +115,32 @@ app.post("/auth", (request, response) => {
   );
 });
 
+//create businesses
+app.post("/add-business", async (request, response) => {
+  const {
+    business_name,
+    business_type,
+    business_address,
+    business_contact,
+    business_socials,
+    business_email,
+    business_description,
+  } = request.body;
+  pool.query(
+    "INSERT INTO businesses (business_name, business_type,business_address,business_contact,business_socials,business_email,business_description,user_id) VALUES ($1,$2,$3,$4,$5,$6,$7,$8)",
+    [
+      business_name,
+      business_type,
+      business_address,
+      business_contact,
+      business_socials,
+      business_email,
+      business_description,
+      // request.user.user_id,
+      4,
+    ]
+  );
+});
 // put
 app.put("/update-user/:id", (request, response) => {
   const id = request.params.id;
