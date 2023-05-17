@@ -22,11 +22,6 @@ function App() {
       {/* <div className="h-[30px] bg-red-800">{auth?.user}</div>{" "} */}
       {/* for testing and seeing if user is logged in */}
       <ToastContainer />
-      {/* <h1>SANITY TEST</h1> */}
-      {/* <SanityTest /> */}
-      {/* <HomePage/> */}
-      {/* <img src="./SerBizNavLogo.png" className="App-logo" alt="logo" /> */}
-      {/* <HomePage /> */}
       <Routes>
         <Route path="/AdminPage" element={<AdminPage />} />
         <Route path="/" element={<HomePage />} />
@@ -45,9 +40,6 @@ function App() {
         <Route path="/My-Business" element={<MyBusiness />} />
         {/* <Route path="/Create-Business" element={<Navigate to="/Sign-up" />} /> */}
       </Routes>
-      {/* <HomePageLoggedIn /> */}
-      {/* <AboutPage /> */}
-      {/* <BusinessPage /> */}
     </div>
   );
 }
