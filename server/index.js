@@ -88,25 +88,34 @@ app.post("/add-user", async (request, response) => {
   // console.log(newUser);
 });
 
-// verification
+// VERIFICATION
 app.post("/auth", (request, response) => {
-  const { user_email, password } = request.body;
+  const { user_email, password, user_id, role } = request.body;
 
   pool.query(
-    "SELECT password FROM users WHERE user_email = $1",
+    "SELECT password, user_id, role, user_email FROM users WHERE user_email = $1",
     [user_email],
     (error, results) => {
+      console.log(results, "this is from auth endpoint");
       if (error) {
         throw error;
       }
       // console.log(results.rows[0].password);
-      const dbPassword = results.rows[0].password;
+      const user = results.rows[0];
+      const dbPassword = user.password;
       const isVerified = bcrypt.compareSync(password, dbPassword);
       if (isVerified) {
-        const token = createToken({ ...request.body, password: dbPassword }); //never store password in token
+        const token = createToken(user); //never store password in token
         // const token = createToken({ ...request.body, role }); //never store password in token
         // const token = createToken({ ...request.body, password: dbPassword }); //never store password in token
-        response.status(200).send(token);
+        response.status(200).send({
+          token,
+          user: {
+            user_id: user.user_id,
+            role: user.role,
+            user_email: user.user_email,
+          },
+        });
       } else {
         response.status(401).send();
       }
@@ -116,28 +125,29 @@ app.post("/auth", (request, response) => {
 });
 
 //create businesses
-app.post("/add-business", async (request, response) => {
+// app.use(auth.verifyToken);
+app.post("/add-business", auth.verifyToken, async (request, response) => {
+  console.log(request.user.user_id, "this is request log");
   const {
     business_name,
     business_type,
     business_address,
-    business_contact,
+    business_contacts,
     business_socials,
     business_email,
     business_description,
   } = request.body;
   pool.query(
-    "INSERT INTO businesses (business_name, business_type,business_address,business_contact,business_socials,business_email,business_description,user_id) VALUES ($1,$2,$3,$4,$5,$6,$7,$8)",
+    "INSERT INTO businesses (business_name, business_type,business_address,business_contact,business_socials,business_email,business_description, user_id) VALUES ($1,$2,$3,$4,$5,$6,$7,$8)",
     [
       business_name,
       business_type,
       business_address,
-      business_contact,
+      business_contacts,
       business_socials,
       business_email,
       business_description,
-      // request.user.user_id,
-      4,
+      request.user.user_id,
     ]
   );
 });
@@ -159,6 +169,7 @@ app.put("/update-user/:id", (request, response) => {
 });
 
 // delete
+//check role for security must be an admin
 app.delete("/delete-user/:id", (request, response) => {
   const id = request.params.id;
 
