@@ -1,11 +1,27 @@
 import { BsSearch } from "react-icons/bs";
 import { Link, useNavigate } from "react-router-dom";
 import { AuthContext } from "../contexts/AuthContext";
-import { useContext } from "react";
+import { useContext, useState, useEffect } from "react";
+import axios from "axios";
 
 const Navbar = () => {
   const auth = useContext(AuthContext);
   const navigate = useNavigate();
+  const [hasBusiness, setHasBusiness] = useState(false);
+  const config = {
+    headers: { Authorization: `Bearer ${localStorage.getItem("jwt_token")}` },
+  };
+  useEffect(() => {
+    checkBusiness();
+  }, []);
+
+  const checkBusiness = async () => {
+    //to check if user has existing business or not
+    const id = auth.user.user_id;
+    const response = await axios.get(`/get-business/${id}`, config);
+    setHasBusiness(response.data.rows.length > 0);
+    console.log(response.data.rows.length > 0);
+  };
 
   const logOut = () => {
     auth.setUser();
@@ -23,18 +39,28 @@ const Navbar = () => {
         <div className="navbarHeader">
           <Link to="/">HOME</Link>
           <Link to="/About">ABOUT</Link>
-          <Link>CONTACTS</Link>
+          {/* <Link>CONTACTS</Link> */}
           {auth?.user ? (
             <div>
-              <Link
-                to="/Create-Business"
-                className="text-white bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-full text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-gray-800 dark:hover:bg-gray-700 dark:focus:ring-gray-700 dark:border-gray-700"
-              >
-                Create Business
-              </Link>
+              {hasBusiness ? ( //ternary condition to display a button if the user has a business or not
+                <Link
+                  to="/My-Business"
+                  className="text-white bg-gray-400 hover:duration-500 hover:bg-gray-500 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-full text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-gray-800 dark:hover:bg-gray-700 dark:focus:ring-gray-700 dark:border-gray-700"
+                >
+                  My Business
+                </Link>
+              ) : (
+                <Link
+                  to="/Create-Business"
+                  className="text-white bg-gray-400 hover:duration-500 hover:bg-gray-500 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-full text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-gray-800 dark:hover:bg-gray-700 dark:focus:ring-gray-700 dark:border-gray-700"
+                >
+                  Create Business
+                </Link>
+              )}
+
               <button
                 onClick={logOut}
-                className="text-white bg-gray-800 hover:bg-red-900 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-full text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-gray-800 dark:hover:bg-gray-700 dark:focus:ring-gray-700 dark:border-gray-700"
+                className="text-white bg-gray-400 hover:duration-500 hover:bg-red-900 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-full text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-gray-800 dark:hover:bg-gray-700 dark:focus:ring-gray-700 dark:border-gray-700"
               >
                 Sign Out
               </button>
@@ -44,7 +70,7 @@ const Navbar = () => {
               <Link
                 to="/LogIn"
                 type="button"
-                className="text-gray-900 bg-white border border-gray-300 focus:outline-none hover:bg-blue-500 focus:ring-4 focus:ring-gray-200 font-medium rounded-full text-base px-5 py-2.5 mr-2 mb-2 dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700"
+                className="text-gray-900 border hover:duration-500 border-gray-300 focus:outline-none hover:bg-blue-500 focus:ring-4 focus:ring-gray-200 font-medium rounded-full text-base px-5 py-2.5 mr-2 mb-2 dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700"
               >
                 Log in
               </Link>
@@ -52,7 +78,7 @@ const Navbar = () => {
               <Link
                 to="/Sign-Up"
                 type="button"
-                className="text-gray-900 bg-white border border-gray-300 focus:outline-none hover:bg-blue-500 focus:ring-4 focus:ring-gray-200 font-medium rounded-full text-base px-5 py-2.5 mr-2 mb-2 dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700"
+                className="text-gray-900 border hover:duration-500 border-gray-300 focus:outline-none hover:bg-blue-500 focus:ring-4 focus:ring-gray-200 font-medium rounded-full text-base px-5 py-2.5 mr-2 mb-2 dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700"
               >
                 Sign up
               </Link>
