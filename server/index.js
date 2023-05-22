@@ -429,7 +429,7 @@ app.post("/comment", auth.verifyToken, (request, response) => {
   // const comment = request.body.comment
   // const business_id = request.body.business_id
   pool.query(
-    "INSERT INTO comments (comment, business_id, user_id) VALUES($1, $2, $3)",
+    "INSERT INTO comments (comment, business_id, user_id) VALUES($1, $2, $3, NOW())",
     [comment, business_id, request.user.user_id],
     (error, results) => {
       if (error) {
