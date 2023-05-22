@@ -1,10 +1,11 @@
 import NavbarLoggedIn from "../components/NavbarLoggedIn";
 import BusinessForm from "../components/BusinessForm";
+import Navbar from "../components/Navbar";
 
 const CreateBusiness = () => {
   return (
     <div>
-      <NavbarLoggedIn />
+      <Navbar />
       <BusinessForm />
     </div>
   );
