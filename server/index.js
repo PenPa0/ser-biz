@@ -363,7 +363,7 @@ app.put("/update-business-info/:id", auth.verifyToken, (request, response) => {
 //Display comments to admin
 app.get("/get-all-comments", (request, response) => {
   pool.query(
-    "SELECT * FROM comments WHERE status = pending",
+    "SELECT * FROM comments WHERE status = 'pending' ", // must have the ' ' for it to work
     (error, results) => {
       if (error) {
         throw error;
@@ -408,7 +408,8 @@ app.patch("/update-comment/:id", auth.verifyToken, (request, response) => {
   if (request.user.role !== "admin") {
     return response.status(403).json({ message: "Forbidden" });
   }
-  const id = request.params.id;
+  // const id = request.params.id;
+  const { id } = request.params; //deconstruction of the code above
   const { status } = request.body;
   pool.query(
     "UPDATE comments SET status = $1 WHERE comment_id = $2",
