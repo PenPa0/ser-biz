@@ -73,6 +73,20 @@ app.get("/get-user/:id", (request, response) => {
   );
 });
 
+//DISPLAY BUSINESS TO HOME PAGE
+app.get("/get-newest-business", (request, response) => {
+  // pool.query("SELECT * FROM photos", (error, results) => {
+  pool.query(
+    "SELECT b.business_id, b.business_name, p.photo, p.photo_priority, MAX(p.created_at) AS latest_photo_created_at FROM businesses AS b JOIN photos AS p ON b.business_id = p.business_id WHERE p.created_at >= NOW() - INTERVAL '7 days' GROUP BY b.business_id, b.business_name, p.photo, p.photo_priority ORDER BY latest_photo_created_at DESC",
+    (error, results) => {
+      if (error) {
+        throw error;
+      }
+      response.status(200).json(results);
+    }
+  );
+});
+
 //DISPLAY BUSINESS INFO FOR OWNER
 app.get("/get-business/:id", auth.verifyToken, (request, response) => {
   console.log(
@@ -90,6 +104,26 @@ app.get("/get-business/:id", auth.verifyToken, (request, response) => {
         throw error;
       }
       response.status(200).send(results);
+    }
+  );
+});
+//DISPLAY TO PUBLIC
+app.get("/get-business-public/:id", (request, response) => {
+  console.log(
+    request,
+    "REQUEST LOG REQUEST LOG REQUEST LOG REQUEST LOG REQUEST LOG REQUEST LOG REQUEST LOG"
+  );
+  const id = request.params.id;
+  console.log(id, "FROM GET BUSINESS id request params");
+  pool.query(
+    "SELECT * FROM businesses WHERE business_id = $1",
+    [id],
+    (error, results) => {
+      if (error) {
+        console.log(error, "IM GET BUSINESS ERROR");
+        throw error;
+      }
+      response.status(200).json(results.rows);
     }
   );
 });
@@ -181,7 +215,7 @@ app.post("/auth", (request, response) => {
   );
 });
 
-//create businesses
+//CREATE BUSINESSES
 // app.use(auth.verifyToken);
 app.post("/add-business", auth.verifyToken, async (request, response) => {
   console.log(request.user.user_id, "this is request log");
@@ -233,7 +267,7 @@ app.post("/upload-picture", upload.single("file"), (request, response) => {
 app.post("/create-picture", auth.verifyToken, (request, response) => {
   const { photo, business_id, photo_priority } = request.body;
   pool.query(
-    "INSERT INTO photos (photo, business_id, photo_priority) VALUES($1, $2, $3)",
+    "INSERT INTO photos (photo, business_id, photo_priority, created_at) VALUES($1, $2, $3, NOW())",
     [photo, business_id, photo_priority],
     (error, results) => {
       // const businessId = results.rows[0].business_id;
@@ -245,35 +279,205 @@ app.post("/create-picture", auth.verifyToken, (request, response) => {
     }
   );
 });
-// put
-app.put("/update-user/:id", (request, response) => {
+//FETCH PICTURE OF BUSINESS TO DISPLAY FOR THE USER/OWNER
+app.get("/get-picture/:id", auth.verifyToken, (request, response) => {
   const id = request.params.id;
-  const { name, email } = request.body;
-
+  console.log(
+    request,
+    "IM FROM GET PICTURE IM FROM GET PICTURE IM FROM GET PICTURE"
+  );
+  console.log(
+    response,
+    "RESPONSE GET PICTURE RESPONSE GET PICTURE RESPONSE GET PICTURE"
+  );
   pool.query(
-    "UPDATE users SET name = $1, email = $2 WHERE user_id = $3",
-    [name, email, id],
+    "SELECT * FROM photos WHERE business_id = $1",
+    [id],
     (error, results) => {
       if (error) {
         throw error;
       }
-      response.status(200).send("User updated");
+      response.status(200).send(results.rows);
     }
   );
 });
 
+//FETCH PICTURE OF BUSINESS TO DISPLAY PUBLIC
+app.get("/get-picture-public/:id", (request, response) => {
+  const id = request.params.id;
+  console.log(
+    request,
+    "IM FROM GET PICTURE IM FROM GET PICTURE IM FROM GET PICTURE"
+  );
+  console.log(
+    response,
+    "RESPONSE GET PICTURE RESPONSE GET PICTURE RESPONSE GET PICTURE"
+  );
+  pool.query(
+    "SELECT * FROM photos WHERE business_id = $1",
+    [id],
+    (error, results) => {
+      if (error) {
+        throw error;
+      }
+      response.status(200).send(results.rows);
+    }
+  );
+});
+
+app.put("/update-business-info/:id", auth.verifyToken, (request, response) => {
+  // const id = request.params.id;
+  const {
+    business_name,
+    business_type,
+    business_address,
+    business_contacts,
+    business_socials,
+    business_email,
+    business_description,
+    business_id,
+  } = request.body;
+  pool.query(
+    "UPDATE businesses SET business_name = $1 ,business_type = $2,business_address = $3,business_contact = $4,business_socials = $5,business_email =$6,business_description = $7 WHERE business_id = $8 ",
+    [
+      business_name,
+      business_type,
+      business_address,
+      business_contacts,
+      business_socials,
+      business_email,
+      business_description,
+      business_id,
+    ],
+    (error, results) => {
+      if (error) {
+        console.log(error, "This is from Error update business");
+        throw error;
+      }
+      console.log(results, "This is from results update business");
+      response.status(200).send(results);
+    }
+  );
+});
+
+//Display comments to admin
+app.get("/get-all-comments", (request, response) => {
+  pool.query(
+    "SELECT * FROM comments WHERE status = pending",
+    (error, results) => {
+      if (error) {
+        throw error;
+      }
+      response.status(200).json(results);
+    }
+  );
+});
+
+app.get("/get-comments/:id", (request, response) => {
+  const id = request.params.id;
+  pool.query(
+    "SELECT * FROM comments WHERE business_id = $1 JOIN users ON comments.user_id = users.user_id",
+    [id],
+    (error, results) => {
+      if (error) {
+        throw error;
+      }
+      response.status(200).send(results.rows);
+    }
+  );
+});
+
+app.delete("/delete-comment/:id", auth.verifyToken, (request, response) => {
+  if (request.user.role !== "admin") {
+    return response.status(403).json({ message: "Forbidden" });
+  }
+  const id = request.params.id;
+  pool.query(
+    "DELETE FROM comments WHERE comment_id = $1",
+    [id],
+    (error, results) => {
+      if (error) {
+        throw error;
+      }
+      response.status(200).send("Comment deleted");
+    }
+  );
+});
+
+app.patch("/update-comment/:id", auth.verifyToken, (request, response) => {
+  if (request.user.role !== "admin") {
+    return response.status(403).json({ message: "Forbidden" });
+  }
+  const id = request.params.id;
+  const { status } = request.body;
+  pool.query(
+    "UPDATE comments SET status = $1 WHERE comment_id = $2",
+    [status, id],
+    (error, results) => {
+      if (error) {
+        throw error;
+      }
+      response.status(200).send("Comment updated");
+    }
+  );
+});
+// read on Restful api
+app.post("/comment", auth.verifyToken, (request, response) => {
+  console.log(request.body, "HI IM COMMENT BODY LOGS");
+  const { comment, business_id } = request.body;
+  // const comment = request.body.comment
+  // const business_id = request.body.business_id
+  pool.query(
+    "INSERT INTO comments (comment, business_id, user_id) VALUES($1, $2, $3)",
+    [comment, business_id, request.user.user_id],
+    (error, results) => {
+      if (error) {
+        throw error;
+      }
+      response.status(201).send("Comment added");
+    }
+  );
+});
+
+// app.delete("/delete-business/:id", (request, response) => {
+//   const id = request.params.id;
+
+//   pool.query("DELETE FROM users WHERE user_id = $1", [id], (error, results) => {
+//     if (error) {
+//       throw error;
+//     }
+//     response.status(200).send();
+//   });
+// });
+// put
+// app.put("/update-user/:id", (request, response) => {
+//   const id = request.params.id;
+//   const { name, email } = request.body;
+
+//   pool.query(
+//     "UPDATE users SET name = $1, email = $2 WHERE user_id = $3",
+//     [name, email, id],
+//     (error, results) => {
+//       if (error) {
+//         throw error;
+//       }
+//       response.status(200).send("User updated");
+//     }
+//   );
+// });
+
 // delete
 //check role for security must be an admin
-app.delete("/delete-user/:id", (request, response) => {
-  const id = request.params.id;
+// app.delete("/delete-user/:id", (request, response) => {
+//   const id = request.params.id;
 
-  pool.query("DELETE FROM users WHERE user_id = $1", [id], (error, results) => {
-    if (error) {
-      throw error;
-    }
-    response.status(200).send(`User with user_id = ${id} is deleted.`);
-  });
-});
+//   pool.query("DELETE FROM users WHERE user_id = $1", [id], (error, results) => {
+//     if (error) {
+//       throw error;
+//     }
+//     response.status(200).send(`User with user_id = ${id} is deleted.`);
+//   });
+// });
 
 app.listen(PORT, () => {
   console.log(`Listening to PORT ${PORT}...`);
