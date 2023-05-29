@@ -1,26 +1,40 @@
-import Comments from "../components/Comments";
+import PendingComment from "../components/PendingComment";
+import { AuthContext } from "../contexts/AuthContext";
+import { useContext } from "react";
+import { useNavigate } from "react-router-dom";
+
 const AdminPage = () => {
+  const auth = useContext(AuthContext);
+  const navigate = useNavigate();
+
+  const logOut = () => {
+    auth.setUser();
+    navigate("/");
+  };
   return (
     <div className="bg-[url('/public/topography.png')] w-auto h-[500px]">
+      <div className="h-[30px] bg-red-800">{auth.user?.user_email}</div>
+      {console.log(auth, "AUTH KO DI MEGO")}
       <div className="text-neutral-50">.</div>
       <header className="bg-white shadow">
         <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-          <h1 className="text-3xl font-bold tracking-tight text-gray-900">
+          <h1 className="text-3xl font-bold tracking-tight text-gray-900 flex justify-between">
             Admin Dashboard
+            <button
+              onClick={logOut}
+              className="text-white border-2 border-gray-300 hover:duration-500 hover:bg-red-700 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-full text-sm px-5 py-2.5 mr-2 mb-2"
+            >
+              Sign Out
+            </button>
           </h1>
         </div>
       </header>
       <div
         id="BOX"
-        className="text-lg bg-neutral-300 w-4/5 min-h-[600px] mx-auto mt-10 rounded-lg flex flex-wrap"
+        className="text-lg bg-neutral-300 w-4/5 min-h-[600px] mx-auto mt-10 rounded-lg"
       >
-        <Comments />
-        <Comments />
-        <Comments />
-        <Comments />
-        <Comments />
-        <Comments />
-        <Comments />
+        <PendingComment />
+        {/* <PendingComment />*/}
         {/* <div class="block max-w-sm rounded-lg bg-white bg-cover p-6 shadow-lg dark:bg-neutral-700">
           <h5 class="mb-2 text-xl font-medium leading-tight text-neutral-800 text-white dark:text-neutral-50">
             Card title
@@ -45,64 +59,6 @@ const AdminPage = () => {
             Reject
           </button>
         </div> */}
-        {/* <div className="border-2 border-black">
-          <div className="border-2 border-red-600 w-1/2 h-1/2 m-auto">
-            <div>
-              Wow The food here sucks massive bad vibes bro, juju is not on the
-              beat
-            </div>
-            <div>
-              <button
-                type="button"
-                class="focus:outline-none text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800"
-              >
-                ACCEPT
-              </button>
-              <button
-                type="button"
-                class="focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900"
-              >
-                REJECT
-              </button>
-            </div>
-            <div>
-              Wow The food here sucks massive bad vibes bro, juju is not on the
-              beat
-            </div>
-            <div>
-              <button
-                type="button"
-                class="focus:outline-none text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800"
-              >
-                ACCEPT
-              </button>
-              <button
-                type="button"
-                class="focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900"
-              >
-                REJECT
-              </button>
-            </div>
-            <div>
-              Wow The food here sucks massive bad vibes bro, juju is not on the
-              beat
-            </div>
-            <div>
-              <button
-                type="button"
-                class="focus:outline-none text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800"
-              >
-                ACCEPT
-              </button>
-              <button
-                type="button"
-                class="focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900"
-              >
-                REJECT
-              </button>
-            </div>
-          </div>
-        </div> */}
       </div>
 
       <footer class="fixed bottom-0 left-0 z-20 w-full p-4 bg-white border-t border-gray-200 shadow md:flex md:items-center md:justify-between md:p-6 dark:bg-gray-800 dark:border-gray-600">
@@ -113,28 +69,6 @@ const AdminPage = () => {
           </a>
           . All Rights Reserved.
         </span>
-        {/* <ul class="flex flex-wrap items-center mt-3 text-sm font-medium text-gray-500 dark:text-gray-400 sm:mt-0">
-          <li>
-            <a href="#" class="mr-4 hover:underline md:mr-6">
-              About
-            </a>
-          </li>
-          <li>
-            <a href="#" class="mr-4 hover:underline md:mr-6">
-              Privacy Policy
-            </a>
-          </li>
-          <li>
-            <a href="#" class="mr-4 hover:underline md:mr-6">
-              Licensing
-            </a>
-          </li>
-          <li>
-            <a href="#" class="hover:underline">
-              Contact
-            </a>
-          </li>
-        </ul> */}
       </footer>
     </div>
   );
