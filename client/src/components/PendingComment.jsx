@@ -30,7 +30,7 @@ const PendingComment = () => {
     <div className="flex flex-wrap">
       {commentList.map((comment) => {
         return (
-          <div class="block m-auto h-[250px] border-red-500 border-2 max-w-sm rounded-lg bg-white bg-cover p-6 shadow-lg dark:bg-neutral-700">
+          <div class="block m-auto h-[250px] border-2 max-w-sm rounded-lg bg-white bg-cover p-6 shadow-lg dark:bg-neutral-700">
             {/* <p className="border-2 border-yellow-500"></p>; */}
             {/* {console.log(comment, "TEST IM COMMETNS INSIDE DIV DIV")} */}
             {/* // console.log(
