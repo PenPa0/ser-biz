@@ -128,6 +128,19 @@ app.get("/get-business-public/:id", (request, response) => {
   );
 });
 
+//DISPLAY TO SEARCH BAR
+app.get("/all-businesses", (request, response) => {
+  pool.query(
+    "SELECT * FROM businesses INNER JOIN photos ON businesses.business_id = photos.business_id WHERE photos.photo_priority = 1;",
+    (error, results) => {
+      if (error) {
+        throw error;
+      }
+      response.status(200).json(results.rows);
+    }
+  );
+});
+
 // post
 // now encrypted
 app.post("/add-user", async (request, response) => {
@@ -376,7 +389,7 @@ app.get("/get-all-comments", (request, response) => {
 app.get("/get-comments/:id", (request, response) => {
   const id = request.params.id;
   pool.query(
-    "SELECT * FROM comments WHERE business_id = $1 JOIN users ON comments.user_id = users.user_id",
+    "SELECT * FROM comments JOIN users ON comments.user_id = users.user_id WHERE business_id = $1 AND comments.status = 'approved'",
     [id],
     (error, results) => {
       if (error) {
@@ -386,23 +399,23 @@ app.get("/get-comments/:id", (request, response) => {
     }
   );
 });
-
-app.delete("/delete-comment/:id", auth.verifyToken, (request, response) => {
-  if (request.user.role !== "admin") {
-    return response.status(403).json({ message: "Forbidden" });
-  }
-  const id = request.params.id;
-  pool.query(
-    "DELETE FROM comments WHERE comment_id = $1",
-    [id],
-    (error, results) => {
-      if (error) {
-        throw error;
-      }
-      response.status(200).send("Comment deleted");
-    }
-  );
-});
+//DELETE CHANGED TO HAVING IT REJECTED INSTEAD, to keep comments in the databas
+// app.delete("/delete-comment/:id", auth.verifyToken, (request, response) => {
+//   if (request.user.role !== "admin") {
+//     return response.status(403).json({ message: "Forbidden" });
+//   }
+//   const id = request.params.id;
+//   pool.query(
+//     "DELETE FROM comments WHERE comment_id = $1",
+//     [id],
+//     (error, results) => {
+//       if (error) {
+//         throw error;
+//       }
+//       response.status(200).send("Comment deleted");
+//     }
+//   );
+// });
 
 app.patch("/update-comment/:id", auth.verifyToken, (request, response) => {
   if (request.user.role !== "admin") {
@@ -429,7 +442,7 @@ app.post("/comment", auth.verifyToken, (request, response) => {
   // const comment = request.body.comment
   // const business_id = request.body.business_id
   pool.query(
-    "INSERT INTO comments (comment, business_id, user_id) VALUES($1, $2, $3, NOW())",
+    "INSERT INTO comments (comment, business_id, user_id, created_at) VALUES($1, $2, $3, NOW())",
     [comment, business_id, request.user.user_id],
     (error, results) => {
       if (error) {
