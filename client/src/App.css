@@ -49,6 +49,26 @@ body {
   /* background-color: #111827; */
 }
 
+/* width */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: #f1f1f1; 
+}
+ 
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: #888; 
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #555; 
+}
+
 .Mother {
   width: 100%;
   height: 80px;
@@ -60,6 +80,7 @@ body {
   /* background-color: #e7e5e4; */
   background-color: #e2e8f0;
   /* background-image: url(/public/stardust.png); */
+  background-image: url(/public/topography.png);
   position: sticky;
 }
 
