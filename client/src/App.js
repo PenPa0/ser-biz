@@ -12,20 +12,56 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import CreateBusiness from "./pages/CreateBusiness";
 import { AuthProvider, AuthContext } from "./contexts/AuthContext";
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 import AdminPage from "./pages/AdminPage";
+import axios from "axios";
+import SearchPage from "./pages/SearchPage";
 
 function App() {
   const auth = useContext(AuthContext);
+  const { user, setUser } = useContext(AuthContext);
+  useEffect(() => {
+    if (typeof user == "undefined") {
+      const token = localStorage.getItem("jwt_token");
+      console.log(
+        token,
+        "IM FROM TOKEN useCONTEXT IM FROM TOKEN useCONTEXT IM FROM TOKEN useCONTEXT IM FROM TOKEN useCONTEXT"
+      );
+      if (token) {
+        axios
+          .post("http://localhost:8000/auth/verifyToken", {
+            //finish api post endpoint for verification of token
+            jwt_token: token,
+          })
+          .then(function (response) {
+            console.log(response, "HI IM FROM RESPONSE IF STATEMENT IN APP JS");
+            setUser({
+              email: response.data.email,
+              role: response.data.role,
+              user_id: response.data.user_id,
+            });
+          })
+          .catch(function (error) {
+            console.log(
+              error,
+              "HI IM FROM ERROR RESPONSE IF STATEMENT IN APP JS"
+            );
+            console.log("Not logged in");
+          });
+      }
+    }
+  }, [user]);
+
   return (
     <div className="App">
-      {/* <div className="h-[30px] bg-red-800">{auth?.user}</div>{" "} */}
+      {/* {console.log(user, "HI IM USER FROM APP JS SETSTATE")} */}
+      {/* <div className="h-[30px] bg-red-800">{auth?.user?.email}</div> */}
       {/* for testing and seeing if user is logged in */}
       <ToastContainer />
       <Routes>
         <Route path="/AdminPage" element={<AdminPage />} />
         <Route path="/" element={<HomePage />} />
-        <Route path="/Business" element={<BusinessPage />} />
+        <Route path="/Business/:businessId" exact element={<BusinessPage />} />
         <Route path="/About" element={<AboutPage />} />
         <Route path="/Sign-up" element={<SignUp />} />
         <Route path="/LogIn" element={<LogIn />} />
@@ -39,6 +75,7 @@ function App() {
         />
         <Route path="/My-Business" element={<MyBusiness />} />
         {/* <Route path="/Create-Business" element={<Navigate to="/Sign-up" />} /> */}
+        <Route path="/Search" element={<SearchPage />} />
       </Routes>
     </div>
   );
