@@ -9,6 +9,7 @@ const AdminPage = () => {
 
   const logOut = () => {
     auth.setUser();
+    localStorage.removeItem("jwt_token");
     navigate("/");
   };
   return (
