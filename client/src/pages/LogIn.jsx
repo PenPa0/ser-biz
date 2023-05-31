@@ -12,11 +12,12 @@ const LogIn = () => {
 
   const verify = (e) => {
     e.preventDefault();
+    console.log(account_Info, "This is from log in account info");
     axios
       .post("http://localhost:8000/auth", account_Info)
       .then(function (response) {
-        localStorage.setItem("jwt_token", response.data);
-        console.log(response);
+        localStorage.setItem("jwt_token", response.data.token);
+        console.log(response, "HI IM FROM LOG IN RESPONSE AXIOS CALL");
         toast.success(`Welcome Back ${account_Info.user_email}`, {
           position: "top-center",
           autoClose: 1000,
@@ -27,8 +28,20 @@ const LogIn = () => {
           progress: undefined,
           theme: "light",
         });
-        navigate("/");
-        auth.setUser(account_Info.user_email);
+
+        // auth.setUser(response.data.user.user_email);
+        auth.setUser({
+          email: response.data.user.user_email,
+          role: response.data.user.role,
+          user_id: response.data.user.user_id,
+        });
+
+        // auth.setUser(account_Info.user_email);
+        if (response.data.user.role === "admin") {
+          navigate("/AdminPage");
+        } else {
+          navigate("/");
+        }
       })
       .catch(function (error) {
         toast.error(`Email or password does not match. ${error.message}`);
