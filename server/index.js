@@ -7,6 +7,7 @@ const app = express(); // initializing
 const bodyParser = require("body-parser");
 const bcrypt = require("bcrypt");
 const createToken = require("./jwt-token/generateToken");
+const jwt = require("jsonwebtoken");
 const PORT = 8000;
 const auth = require("./middleware/auth");
 const multer = require("multer");
@@ -89,23 +90,28 @@ app.get("/get-newest-business", (request, response) => {
 
 //DISPLAY BUSINESS INFO FOR OWNER
 app.get("/get-business/:id", auth.verifyToken, (request, response) => {
-  console.log(
-    request,
-    "REQUEST LOG REQUEST LOG REQUEST LOG REQUEST LOG REQUEST LOG REQUEST LOG REQUEST LOG"
-  );
+  // console.log(
+  //   request,
+  //   "REQUEST LOG REQUEST LOG REQUEST LOG REQUEST LOG REQUEST LOG REQUEST LOG REQUEST LOG"
+  // );
   const id = request.params.id;
   console.log(id, "FROM GET BUSINESS id request params");
-  pool.query(
-    "SELECT * FROM businesses WHERE user_id = $1",
-    [id],
-    (error, results) => {
-      if (error) {
-        console.log(error, "IM GET BUSINESS ERROR");
-        throw error;
+  if (id) {
+    pool.query(
+      "SELECT * FROM businesses WHERE user_id = $1",
+      [id],
+      (error, results) => {
+        if (error) {
+          console.log(error, "IM GET BUSINESS ERROR");
+          // throw error;
+          response.status(404);
+        }
+        response.status(200).send(results);
       }
-      response.status(200).send(results);
-    }
-  );
+    );
+  } else {
+    response.status(400);
+  }
 });
 //DISPLAY TO PUBLIC
 app.get("/get-business-public/:id", (request, response) => {
@@ -143,6 +149,7 @@ app.get("/all-businesses", (request, response) => {
 
 // post
 // now encrypted
+//SIGN UP / CREATION OF USER
 app.post("/add-user", async (request, response) => {
   const { first_name, last_name, user_email, password } = request.body;
   const encryptedPassword = await bcrypt.hashSync(password, 10);
@@ -176,21 +183,22 @@ app.post("/add-user", async (request, response) => {
   // console.log(newUser);
 });
 
-// app.post("/auth/verifyToken", (request, response) => {
-//   const jwt_token = request.body.jwt_token;
-
-//   try {
-//     const decode = jwt.verify(jwt_token, process.env.jwt_secret);
-//     console.log(decode);
-//     return response.status(200).send({
-//       email: decode.email,
-//       password: decode.password,
-//     });
-//   } catch (error) {
-//     console.log(error);
-//     return response.status(401).send("fsfsf");
-//   }
-// });
+app.post("/auth/verifyToken", (request, response) => {
+  const jwt_token = request.body.jwt_token;
+  console.log(jwt_token, "IM JWT FROM AUTH VERIFY TOKEN ");
+  try {
+    const decode = jwt.verify(jwt_token, process.env.jwt_secret);
+    console.log(decode, " HI IM DECODE ");
+    return response.status(200).send({
+      email: decode.user_email,
+      role: decode.role,
+      user_id: decode.user_id,
+    });
+  } catch (error) {
+    console.log(error);
+    return response.status(401).send("fsfsf");
+  }
+});
 
 // VERIFICATION
 app.post("/auth", (request, response) => {
