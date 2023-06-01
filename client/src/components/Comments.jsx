@@ -1,7 +1,20 @@
 import { useState, useContext, useEffect, useRef } from "react";
 import { AuthContext } from "../contexts/AuthContext";
+import axios from "axios";
+import moment from "moment";
+
 const Comments = (props) => {
   const [isHidden, setIsHidden] = useState(true);
+  const [isEditing, setIsEditing] = useState(false);
+
+  const [updateComment, setUpdateComment] = useState({
+    comment: props.viewComment.comment,
+    user_id: props.viewComment.user_id,
+    comment_id: props.viewComment.comment_id,
+  });
+  const config = {
+    headers: { Authorization: `Bearer ${localStorage.getItem("jwt_token")}` },
+  };
   const auth = useContext(AuthContext);
   let menuRef = useRef();
   const handleDropdown = () => {
@@ -11,10 +24,18 @@ const Comments = (props) => {
     setIsHidden(true);
   };
 
+  const editComment = async (e) => {
+    e.preventDefault();
+    console.log(e, "IM E FROM EDIT COMMENT FRONT END");
+    const response = await axios.patch("/edit-comment", updateComment, config);
+    console.log(response, "IM ReSPONSE FROM EDIT COMMENT FRONTEND");
+  };
+
   useEffect(() => {
     let handleClickOutside = (e) => {
       if (menuRef.current && !menuRef.current.contains(e.target)) {
         setIsHidden(true);
+        setIsEditing(false);
         console.log(menuRef.current);
       }
     };
@@ -23,23 +44,25 @@ const Comments = (props) => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   });
-
+  const formatDate = props.viewComment.created_at;
   return (
     <article class="p-6 mb-6 text-base bg-white border-t border-gray-200 dark:border-gray-700 dark:bg-gray-900">
+      {console.log(props.viewComment, "IM INSIDE VIEW COMMENT PROPS")}
       {console.log(auth.user, "HI IM AUTH USER AT COMMENTS")}
       <footer class="flex justify-between items-center mb-2">
         <div class="flex items-center">
-          <p class="inline-flex items-center mr-3 text-sm text-neutral-200 dark:text-white">
+          <p class="inline-flex items-center mr-3 text-sm text-white-50 dark:text-white">
             {/* <img
             class="mr-2 w-6 h-6 rounded-full"
             src="https://flowbite.com/docs/images/people/profile-picture-3.jpg"
             alt="Bonnie Green"
           /> */}
+
             {props.viewComment.user_email}
           </p>
-          <p class="text-sm text-gray-600 dark:text-gray-400">
-            <time pubdate datetime="2022-03-12" title="March 12th, 2022">
-              {props.viewComment.created_at}
+          <p class="text-sm text-white-50 dark:text-gray-400">
+            <time /*pubdate datetime="2022-03-12" title="March 12th, 2022"*/>
+              {moment(new Date(formatDate)).format("lll")}
             </time>
           </p>
         </div>
@@ -73,37 +96,39 @@ const Comments = (props) => {
                 class="{}hidden z-10 w-36 bg-white rounded divide-y divide-gray-100 shadow dark:bg-gray-700 dark:divide-gray-600"
               >
                 <ul
-                  class="py-1 text-sm text-gray-700 dark:text-gray-200"
+                  class="py-1 text-sm text-white-50 dark:text-gray-200"
                   aria-labelledby="dropdownMenuIconHorizontalButton"
                 >
                   {auth.user.user_id === props.viewComment.user_id && ( //&& means if Condition is true Render my block, if its false render nothing.
                     <>
                       <li>
-                        <a
-                          onClick={hideDropdown}
-                          //   href="#"
+                        <p
+                          onClick={() => {
+                            setIsEditing(true);
+                            // hideDropdown();
+                          }}
                           className="block py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
                         >
                           Edit
-                        </a>
+                        </p>
                       </li>
                       <li>
-                        <a
+                        <p
                           //   href="#"
                           className="block py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
                         >
                           Remove
-                        </a>
+                        </p>
                       </li>
                     </>
                   )}
                   <li>
-                    <a
+                    <p
                       //   href="#"
                       className="block py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
                     >
                       Report
-                    </a>
+                    </p>
                   </li>
                 </ul>
               </div>
@@ -113,9 +138,43 @@ const Comments = (props) => {
           ""
         )}
       </footer>
-      <p class="text-gray-500 dark:text-gray-400">
-        {props.viewComment.comment}
-      </p>
+      <>
+        {isEditing === false ? (
+          <p class="text-neutral-200 dark:text-gray-400">
+            {props.viewComment.comment}
+          </p>
+        ) : (
+          <form ref={menuRef} onSubmit={editComment} class="mb-6">
+            <div class="py-2 px-4 mb-4 bg-white rounded-lg rounded-t-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700">
+              <label for="comment" class="sr-only">
+                Your comment
+              </label>
+              <textarea
+                defaultValue={props.viewComment.comment}
+                // value={updateComment.comment}
+                onChange={(e) => {
+                  let value = e.target.value;
+                  // console.log(value);
+
+                  setUpdateComment({ ...updateComment, comment: value });
+                  // console.log(updateComment, "IM UPDATE COMMENT ONCHANGE");
+                }}
+                id="comment"
+                rows="6"
+                class="px-0 w-full text-sm text-gray-900 border-0 focus:ring-0 focus:outline-none dark:text-white dark:placeholder-gray-400 dark:bg-gray-800"
+                placeholder="Write a comment..."
+                required
+              ></textarea>
+            </div>
+            <button
+              type="submit"
+              class="text-white-50 bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-blue-300  font-medium rounded-lg text-xs px-4 py-2.5 text-center mr-2 mb-2"
+            >
+              Post comment
+            </button>
+          </form>
+        )}
+      </>
       <div class="flex items-center mt-4 space-x-4">
         <button
           type="button"
