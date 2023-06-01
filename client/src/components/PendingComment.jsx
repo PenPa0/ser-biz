@@ -21,6 +21,7 @@ const PendingComment = () => {
         Authorization: `Bearer ${localStorage.getItem("jwt_token")}`,
       },
     });
+    getComments();
   };
 
   useEffect(() => {
